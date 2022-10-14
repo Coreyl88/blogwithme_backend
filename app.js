@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+const port = 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -14,6 +15,19 @@ app.use("/api/user", router);
 app.use("/api/blog", blogRouter);
 
 mongoose.connect(process.env.MONGODB_URI)
-.then(()=>app.listen(4000))
-.then(()=>console.log("Connected to Database and Listening to Local Host 4000"))
-.catch((err)=>console.log(err));
+
+mongoose.connection.on('connected', ()=>console.log(
+    `${new Date().toLocaleTimeString()}: MongoDB connected...✅ ✅ ✅`
+))
+
+mongoose.connection.on('error', (error)=>console.log(
+    `${new Date().toLocaleTimeString()}: MongoDB error encountered...❌ ❌ ❌ \n ${{error}}`
+))
+
+mongoose.connection.on('disconnnected', ()=>console.log(
+    `${new Date().toLocaleTimeString()}: MongoDB disconnected.`
+))
+
+app.listen(process.env.PORT || port, () => {
+    console.log(`Server is listening on ${port}`);
+});
